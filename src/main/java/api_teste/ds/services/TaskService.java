@@ -68,7 +68,7 @@ public class TaskService {
             User user = this.userService.findById(obj.getUser().getId());
             
             //Define o ID como null para garantir que o JPA realize uma inserção(INSERT) e não uma atualização.
-            obj.setId(id:null);
+            obj.setId(null);
 
             //Associa a entidade User completa e valida a tarefa.
             obj.setUser(user);
