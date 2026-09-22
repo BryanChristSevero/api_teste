@@ -1,109 +1,106 @@
+//Pacote onde está a classe de serviço no projeto
 package api_teste.ds.services;
 
-import api_teste.ds.DsApplication;
-//Importa lista da biblioteca padrão do Java para manipular coleções de objetos.
+//Importa List da Biblioteca padrão do Java para manipular coleções de objetos. 
 import java.util.List;
-//Importa optional, usado para tratr valores que podem não estar presentes(evita NUllExpectionPointer).
+//Importa Optional, usado para tratar valores que podem não estar presentes (evita NullExceptionPointer)
 import java.util.Optional;
 
-//Importa a anotação do Spring para injeção automatica de dependencias.
+
+//Importa a anotação do Spring para a injeção automática de dependencias
 import org.springframework.beans.factory.annotation.Autowired;
-//Importa a anotação que define essa classe como um componente de serviço gerenciado pelo Spring.
+//Importa a anotação que define essa classe como um componente de serviço gerenciado pelo Spring
 import org.springframework.stereotype.Service;
-//Importa a anotação para gerenciar transações no banco de dados(garante atomicidade na operação).
+//Importa a anotação para greenciar transações no banco de dados(garante atomicidade na operação)
 import org.springframework.transaction.annotation.Transactional;
 
 //Importa o models.Task
 import api_teste.ds.models.Task;
 //Importa o models.User
 import api_teste.ds.models.User;
-//Importa a interface do repositorio responsavel pelas operações no banco de dados.
+//Importa a interface do reppositório responsável pelas operações no banco de dados
 import api_teste.ds.repositories.TaskRepository;
 
-//Anotação que indica para o Spring que essa classe contem as regras de negócio.
-@Service
-public class TaskService {
 
-    private final DsApplication dsApplication;
+//Anotação qie indica para o Spring que essa classe contem as regras de negócio
+@Service 
+public  class TaskService {
 
-    //Injeta automaticamente a  instancia do TaskRepository gerenciado pelo Spring.
-    @Autowired
+    //Injeta automaticamente a instancia do TaskRepository gerenciado pelo Spring
+    @Autowired 
     private TaskRepository taskRepository;
 
-    //Injeta automaticamente a instancia do UserService para validar o usuário.
-    @Autowired
+    //Injeta automaticamente a Instancia do UserService para validar o usuário
+    @Autowired 
     private UserService userService;
 
-    TaskService(DsApplication dsApplication) {
-        this.dsApplication = dsApplication;
-    }
-
-    //Método para buscar Task a partir do ID.
+    //Método para buscar task apartir do ID
     public Task findById(Long Id){
-        //Executa a busca no banco, retorna um Optional contendo (ou não) a Task.
+        //Executa a busca no banco, retorna um Optional contendo (ou não) a Task
         Optional<Task> task = this.taskRepository.findById(Id);
 
-        //Se a tarefa existir, retorna o objeto, se estiver vazio, lança um RuntimeException.
+        // Se a tarefa existir, retorna o objeto, se estiver vazio, lança um RunTimeException
         return task.orElseThrow(()-> new RuntimeException(
-            "Tarefa não encontrada! Id:"+ Id + ", Tipo:"+ Task.class.getName()
+            "Tarefa não encontrada! Id:"+ Id + ",Tipo:" + Task.class.getName()
         ));
     }
 
-    //Método para buscar todas as tarefas vinculadas a um determinado usuário.
+    //Método para buscar todas as tarefas  vinculadas a um determinado usuario
     public List<Task> findByUserId(Long UserId){
-        //Chama o UserService para garantir que o usuário existe no banco(lança exceção se não existir).
+
+        //Chama o UserService para garantir que o usuário existe no banco(lança exceção se não existir)
         this.userService.findById(UserId);
 
-        //Executa a busca customizada no repositorio filtrando pelo Id do usuário.
-        List<Task> tasks = this.taskRepository.findByUserId(UserId);
+        //Executa a busca customizada no repositótio filtrando pelo id do usuario
+        List<Task> tasks = this.taskRepository.findByUser_Id(UserId);
 
-        //Retorna a lista de tarefas.
+        //Retorna a lista de tarefas
         return tasks;
-    }
+        }
 
-        //Garante que a criação ocorra dentro de uma transação de banco de dados(rolback automatico se falhar).
-        @Transactional
+        //Garante que criação ocorra dentro de uma transação de banco de dados(rolback automático se falhar)
+        @Transactional 
         public Task create(Task obj){
-            //Valida se o usuário informado no objeto realmente existe no banco e recupera seus dados.
+            //Valida se o usuario informado no objeto realmente existe no banco e recupera seus dados
             User user = this.userService.findById(obj.getUser().getId());
-            
-            //Define o ID como null para garantir que o JPA realize uma inserção(INSERT) e não uma atualização.
+
+            // Define o ID como null para garantir que o JPA realize um inserção(INSERT) e não uma atualização
             obj.setId(null);
 
-            //Associa a entidade User completa e valida a tarefa.
+            //Associa a entidade User completa e validadada a tarefa
             obj.setUser(user);
 
-            //Salva a nova tarefa no banco de dados e atualiza 'obj' com o ID gerado.
+            //Salva a nva tarefa no banco de dados e atualiza 'obj' com o ID gerado
             obj = this.taskRepository.save(obj);
 
-            //Retorna a tarefa salva.
+            //Retorna a tarfa salva
             return obj;
         }
 
-        //Garante que a atualização ocorra dentro de transação isolada no banco.
-        @Transactional
+        //Garante que a atualização ocorra dentro de transação isolada no banco
+        @Transactional 
         public Task update(Task obj){
-            //Reaproveita findById para verificar se a tarefa a ser atualizada existe realmente.
+            //Reaproveita o findByID para verificar se atarefa a ser atualizada existe realmente
             Task newObj = findById(obj.getId());
 
-            //Atualiza apenas o campo descrição do objeto persistido com o novo valor.
+            //Atualiza apenas o campo descricao do objeto persistido com o novo valo
             newObj.setDescription(obj.getDescription());
 
-            //Salva a alteração no banco de dados e retorna o objeto atualizado.
-            return this.taskRepository.save(newObj);
+            //Salva a alteração no banco de dados e retorna o objeto atualizado
+            return  this.taskRepository.save(newObj);
         }
 
-        //Método para deletar uma tarefa pelo ID.
-        public void delete(long Id){
-            //Verifica se a tarefa existe antes de tentar deletar.
+        //Método para deletar uma tarefa pelo Id
+        public void delete(Long Id){
+            //Verifica se a tarefa existe antes de tentar deletar
             findById(Id);
 
-            try {
-                //Solicita a remoção da tarefa no banco de dados pelo ID.
+            try{
+                //Solicita a remoção da tarefa no banco de dados pelo ID 
                 this.taskRepository.deleteById(Id);
             } catch (Exception e){
-                //Captura exceções como violações de chave estrangeira e lança uma mensagem amigavel.
-                throw new RuntimeException("Não é possivel excluir pois não há tarefas relacionadas");
+                //Capctura execções (como violações de chave estrangeira e lança uma mensagem amigável)
+                throw new RuntimeException("Não é posspivel excuir pois não há tarefas relacionadas");
             }
         }
-}
+    }
