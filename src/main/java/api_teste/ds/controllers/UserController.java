@@ -28,13 +28,9 @@ import org.springframework.web.bind.annotation.RestController;
 //importa utilitario para gerar a URI da requisição atual dinamicamente.
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-//
 import api_teste.ds.models.User;
-//
 import api_teste.ds.models.User.CreateUser;
-//
 import api_teste.ds.models.User.UpdateUser;
-//
 import api_teste.ds.services.UserService;
 import org.springframework.web.bind.annotation.RequestParam;
 
