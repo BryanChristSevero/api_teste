@@ -45,14 +45,19 @@ public  class TaskService {
         ));
     }
 
+    public List<Task> findAllByUserId(Long userId){
+        List<Task> tasks = this.taskRepository.findByUser_Id(userId);
+        return tasks;
+    }
+
     //Método para buscar todas as tarefas  vinculadas a um determinado usuario
-    public List<Task> findByUserId(Long UserId){
+    public List<Task> findByUserId(Long userId){
 
         //Chama o UserService para garantir que o usuário existe no banco(lança exceção se não existir)
-        this.userService.findById(UserId);
+        this.userService.findById(userId);
 
         //Executa a busca customizada no repositótio filtrando pelo id do usuario
-        List<Task> tasks = this.taskRepository.findByUser_Id(UserId);
+        List<Task> tasks = this.taskRepository.findByUser_Id(userId);
 
         //Retorna a lista de tarefas
         return tasks;
