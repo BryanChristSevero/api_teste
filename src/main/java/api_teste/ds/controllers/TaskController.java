@@ -59,8 +59,8 @@ public class TaskController {
     }
 
     @GetMapping ("/user/{userid}")
-    public ResponseEntity<List<Task>> findAllByUserId(@PathVariable Long userId){
-        List<Task> objs = this.taskService.findAllByUserId(userId);
+    public ResponseEntity<List<Task>> findAllByUserId(@PathVariable Long userid){
+        List<Task> objs = this.taskService.findAllByUserId(userid);
         return ResponseEntity.ok().body(objs);
     }
 
@@ -74,7 +74,7 @@ public ResponseEntity<Void> create(@Valid @RequestBody Task obj) {
     return ResponseEntity.created(url).build();
 }
 
-    @PostMapping ("/{id}")
+    @PutMapping ("/{id}")
     public ResponseEntity<Void> update(@Valid @RequestBody Task obj, @PathVariable Long id){
         obj.setId(id);
         this.taskService.update(obj);
