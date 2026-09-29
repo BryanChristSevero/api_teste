@@ -64,13 +64,15 @@ public class TaskController {
         return ResponseEntity.ok().body(objs);
     }
 
-    @GetMapping
-    public ResponseEntity<Void> create(@Valid @RequestBody Task obj){
-        this.taskService.create(obj);
-        URI url = ServletUriComponentsBuilder.fromCurrentRequest()
-        .path("/{id}").buildAndExpand(obj.getId()).toUri();
-        return ResponseEntity.created(url).build();
-    }
+    @PostMapping
+public ResponseEntity<Void> create(@Valid @RequestBody Task obj) {
+    this.taskService.create(obj);
+    URI url = ServletUriComponentsBuilder.fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(obj.getId())
+            .toUri();
+    return ResponseEntity.created(url).build();
+}
 
     @PostMapping ("/{id}")
     public ResponseEntity<Void> update(@Valid @RequestBody Task obj, @PathVariable Long id){
